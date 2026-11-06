@@ -47,12 +47,10 @@ app.get("/janken", (req, res) => {
   if( num==1 ) cpu = 'グー';
   else if( num==2 ) cpu = 'チョキ';
   else cpu = 'パー';
+
   // ここに勝敗の判定を入れる
   // 以下の数行は人間の勝ちの場合の処理なので，
   // 判定に沿ってあいこと負けの処理を追加する
-  judgement = '勝ち';
-  win += 1;
-  total += 1;
   const display = {
     your: hand,
     cpu: cpu,
@@ -61,6 +59,75 @@ app.get("/janken", (req, res) => {
     total: total
   }
   res.render( 'janken', display );
+});
+
+
+app.get("/janken2", (req, res) => {
+  let hand = req.query.hand;
+  let win = Number( req.query.win ) || 0;
+  let total = Number( req.query.total ) || 0;
+  console.log( {hand, win, total});
+  const num = Math.floor( Math.random() * 3 + 1 );
+  let cpu = '';
+  let judgement = '';
+  if( num==1 ) cpu = 'グー';
+  else if( num==2 ) cpu = 'チョキ';
+  else cpu = 'パー';
+
+   if (hand == cpu) {
+    judgement = 'あいこ';
+  }
+  else if (
+    (hand == 'グー' && cpu == 'チョキ') ||
+    (hand == 'チョキ' && cpu == 'パー') ||
+    (hand == 'パー' && cpu == 'グー')
+  ) {
+    judgement = '勝ち';
+    win += 1;
+  }
+  else {
+    judgement = '負け';
+  }
+
+  total += 1;
+  // ここに勝敗の判定を入れる
+  // 以下の数行は人間の勝ちの場合の処理なので，
+  // 判定に沿ってあいこと負けの処理を追加する
+
+  const display = {
+    your: hand,
+    cpu: cpu,
+    judgement: judgement,
+    win: win,
+    total: total
+  }
+  res.render( 'janken2', display );
+});
+
+let station = [
+  { id:1, code:"JE01", name:"東京駅"},
+  { id:2, code:"JE07", name:"舞浜駅"},
+  { id:3, code:"JE12", name:"新習志野駅"},
+  { id:4, code:"JE13", name:"幕張豊砂駅"},
+  { id:5, code:"JE14", name:"海浜幕張駅"},
+  { id:6, code:"JE05", name:"新浦安駅"},
+];
+
+app.get("/keiyo", (req, res) => {
+
+  // 本来ならここにDBとのやり取りが入る
+  res.render('db2', { data: station });
+});
+
+app.get("/keiyo_add", (req, res) => {
+  let id = req.query.id;
+  let code = req.query.code;
+  let name = req.query.name;
+  let newdata = { id: id, code: code, name: name };
+  station.push( newdata );
+  res.render('db2', { data: station });
+  
+
 });
 
 app.listen(8080, () => console.log("Example app listening on port 8080!"));
